@@ -38,8 +38,6 @@
 			// AppSurveyResult,
 		},
 		data: () => ({
-			datas: null,
-			FBData: [],
 			surveyCounter: 0,
 			ansSum: [
 				Array(182).fill(0),
@@ -235,21 +233,6 @@
 			],
 		}),
 		methods: {
-			async getData() {
-				var that = this;
-				this.unsubscribe = db
-					.collection("reviews")
-					.onSnapshot(function (querySnapshot) {
-						let newData = [];
-						querySnapshot.forEach(function (doc) {
-							// doc.data() is never undefined for query doc snapshots
-							console.log(doc.id, " => ", doc.data());
-							newData.push(doc.data());
-							// that.datas += doc.id
-						});
-						that.FBData = newData;
-					});
-			},
 			updateUI(surveys) {
 				this.surveyCounter = surveys.length;
 				let ansTotal = [
@@ -271,22 +254,22 @@
 				this.ansSum = ansTotal;
 			},
 		},
-		watch: {
-			FBData: function (val) {
-				this.updateUI(val);
-			},
-		},
-		computed: {
-			update() {
-				console.log("something changed");
-				return this.datas;
-			},
-		},
 		created() {
-			this.getData();
+			var that = this;
+			this.unsubscribe = db
+				.collection("reviews")
+				.onSnapshot(function (querySnapshot) {
+					let newData = [];
+					querySnapshot.forEach(function (doc) {
+						// doc.data() is never undefined for query doc snapshots
+						// console.log(doc.id, " => ", doc.data());
+						newData.push(doc.data());
+					});
+					that.updateUI(newData);
+				});
 		},
 		beforeDestroy() {
-			if (this.unsubscribe) {
+			if (this.unsubscribe != null) {
 				this.unsubscribe();
 			}
 		},
@@ -298,7 +281,6 @@
 		font-family: Avenir, Helvetica, Arial, sans-serif;
 		-webkit-font-smoothing: antialiased;
 		-moz-osx-font-smoothing: grayscale;
-		/* text-align: center; */
 		color: #2c3e50;
 	}
 </style>
