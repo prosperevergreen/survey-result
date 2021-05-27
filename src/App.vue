@@ -9,7 +9,8 @@
 			</div>
 			<div class="card my-3 bg-info">
 				<div class="card-body">
-					<h5 class="card-title text-light font-weight-bold" style="font-size: 1.5rem">Прошли опрос: {{surveyCounter}} людей</h5>
+					<h5 class="card-title text-light font-weight-bold" style="font-size: 1.5rem">Прошли опрос: {{surveyCounter}} людей (female: {{girlCount}}, male: {{boyCount}} and others: {{otherCount}})</h5>
+					<h5 class="card-title text-light font-weight-bold" style="font-size: 1.5rem">Возраст: <span v-for="(age, index) in ages" :key=index>{{age}},</span> </h5>
 				</div>
 			</div>
 			<div class="row d-flex justify-center">
@@ -38,6 +39,10 @@
 			// AppSurveyResult,
 		},
 		data: () => ({
+			ages:[],
+			girlCount: 0,
+			boyCount: 0,
+			otherCount: 0,
 			surveyCounter: 0,
 			ansSum: [
 				Array(182).fill(0),
@@ -244,6 +249,19 @@
 				];
 
 				for (const survey of surveys) {
+					survey.age ? this.ages.push(survey.age) : this.ages.push(0)
+					switch (survey.sex) {
+						case "Мужской":
+							this.boyCount++;
+							break;
+						case "Женский":
+							this.girlCount++;
+							break;
+						default:
+							this.otherCount++;
+							break;
+					}
+
 					let answer = survey.answers;
 					for (let index = 0; index < answer.length; index++) {
 						if (answer[index] > 0) {
